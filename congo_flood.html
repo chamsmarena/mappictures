@@ -17,6 +17,7 @@
 	<script src="lib/leaflet/leaflet.js"></script>
 	<script src="lib/cluster/leaflet.markercluster.js"></script>	
 	<script src="lib/leaflet/Leaflet.Photo.js"></script>	
+	<script type="text/javascript" src="js/jquery.ajax-cross-origin.min.js"></script>
 		
 	<script>
 
@@ -61,11 +62,13 @@
 		}
 	});
 
-
+/*
 	jQuery.ajax({
 		url: 'https://kc.humanitarianresponse.info/api/v1/data/463232',
 		type: 'GET',
-		crossDomain: true,
+		xhrFields: {
+        withCredentials: true
+    },
 		contentType: 'application/json',
 		headers: {
 			'Authorization': 'token 95a7a8dd91943c4f1a640e85b007b6fa55be9ba6'
@@ -77,7 +80,20 @@
 			console.log("error")
 			console.log(error)
 		}
-	});
+	});*/
+
+	reqwest({
+    url: 'https://kc.humanitarianresponse.info/api/v1/data/463232?format=json'
+  , type: 'json'
+  , method: 'post'
+  , contentType: 'application/json'
+  , crossOrigin: true
+  , withCredentials: true
+  , error: function (err) { }
+  , success: function (resp) {
+      qwery('#content').html(resp.content)
+    }
+})
 	
 	</script>
 </body>
