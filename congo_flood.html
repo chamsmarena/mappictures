@@ -34,67 +34,31 @@
 			minWidth: 400
 		}).openPopup();
 	});
-/*
-	reqwest({
-		url: 'http://kulturnett2.delving.org/api/search?query=*%3A*&format=jsonp&rows=100&pt=59.936%2C10.76&d=1&qf=abm_contentProvider_text%3ADigitaltMuseum',
-		type: 'jsonp',
-		success: function (data) {
-			var photos = [];
-			data = data.result.items;
 
-			for (var i = 0; i < data.length; i++) {
-				var photo = data[i].item.fields;
-				if (photo.abm_latLong) {
-					var pos = photo.abm_latLong[0].split(',');
-					photos.push({
-						lat: pos[0],
-						lng: pos[1],
-						url: photo.delving_thumbnail[0],
-						caption: (photo.delving_description ? photo.delving_description[0] : '') + ' - Kilde: <a href="' + photo.delving_landingPage + '">' + photo.delving_collection + '</a>',
-						thumbnail: photo.delving_thumbnail[0]
-					});
-				}	
+
+	$.getJSON("https://spreadsheets.google.com/feeds/list/1TugXPmO6ibDaHJAYhrFHo_DIa9BRyhiDvSBEP8Ox47I/od6/public/values?alt=json", function(data) {
+		var photos = [];
+		result = data.feed.entry;
+		console.log(result)
+		$.each(result, function(i, field){
+
+			if (!isNaN(parseFloat(field.gsx$latitude.$t))) {
+				photos.push({
+					lat: parseFloat(field.gsx$latitude.$t),
+					lng: parseFloat(field.gsx$longitude.$t),
+					url: field.gsx$largeurl.$t,
+					caption: "sdsdsd",
+					thumbnail: field.gsx$smallurl.$t
+				});
 			}
-
-			photoLayer.add(photos).addTo(map);
-			map.fitBounds(photoLayer.getBounds());
-		}
-	});*/
-
-
-/*
-$.getJSON( "https://spreadsheets.google.com/feeds/cells/1TugXPmO6ibDaHJAYhrFHo_DIa9BRyhiDvSBEP8Ox47I/1/public/full?alt=json", function( data ) {
-	console.log(data)
-  /*var items = [];
-  $.each( data, function( key, val ) {
-    items.push( "<li id='" + key + "'>" + val + "</li>" );
-  });
-
-});*/
-
-		$.getJSON("https://spreadsheets.google.com/feeds/list/1TugXPmO6ibDaHJAYhrFHo_DIa9BRyhiDvSBEP8Ox47I/od6/public/values?alt=json", function(data) {
-			var photos = [];
-			result = data.feed.entry;
-			console.log(result)
-			$.each(result, function(i, field){
-
-				if (!isNaN(parseFloat(field.gsx$latitude.$t))) {
-					photos.push({
-						lat: parseFloat(field.gsx$latitude.$t),
-						lng: parseFloat(field.gsx$longitude.$t),
-						url: field.gsx$largeurl.$t,
-						caption: "sdsdsd",
-						thumbnail: field.gsx$smallurl.$t
-					});
-				}
-			});
-
-			console.log(photos)
-
-			photoLayer.add(photos).addTo(map);
-			map.fitBounds(photoLayer.getBounds());
-
 		});
+
+		console.log(photos)
+
+		photoLayer.add(photos).addTo(map);
+		map.fitBounds(photoLayer.getBounds());
+
+	});
 
 
 	
