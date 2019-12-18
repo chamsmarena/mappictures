@@ -126,37 +126,14 @@
 				
 				$.each(datas, function(i, data){
 					url = "";
-					
 					console.log(data);
 					if (data._attachments.length>0) {
 						if (!isNaN(parseFloat(data._geolocation[0]))) {
-							nbhouses = "";
-							severity = "";
-							village = "";
-							numberAffecte = "";
-
-							if(data.Nombre_de_maisons_affectees!=undefined){
-								nbhouses = "<strong>Number of affected houses</strong> : "+data.Nombre_de_maisons_affectees+"<br/>";
-							}
-
-							if(data.Nombre_de_maisons_affectees!=undefined){
-								severity = "<strong>Number of affected houses</strong> : "+data.Severite_impact+"<br/>";
-							}
-
-							if(data.Nombre_de_maisons_affectees!=undefined){
-								village = "<strong>Number of affected houses</strong> : "+data.Nom_du_village+"<br/>";
-							}
-
-							if(data.Nombre_de_maisons_affectees!=undefined){
-								numberAffecte = "<strong>Estimation of number of affected people</strong> : "+data.Estimation_nombre_pop+"<br/>";
-							}
-
-
 							photos.push({
 								lat: data._geolocation[0],
 								lng: data._geolocation[1],
 								url: data._attachments[0].download_url,
-								caption: severity+nbhouses+numberAffecte+village,
+								caption: "",
 								thumbnail: data._attachments[0].download_small_url
 							});
 
