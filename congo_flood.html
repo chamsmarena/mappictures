@@ -100,17 +100,62 @@
 		maxZoom: 17
 	});
 
-	L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	/*L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+	}).addTo(map);*/
+
+	var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
 	attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
 	}).addTo(map);
 
+	var OpenMapSurfer_Hybrid = L.tileLayer('https://maps.heigit.org/openmapsurfer/tiles/hybrid/webmercator/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: 'Imagery from <a href="http://giscience.uni-hd.de/">GIScience Research Group @ University of Heidelberg</a> | Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+	}).addTo(map);
+
 	var photoLayer = L.photo.cluster({ spiderfyDistanceMultiplier: 1.2 }).on('click', function (evt) {
-		evt.layer.bindPopup(L.Util.template('<img src="{url}" /></a><p>{caption}</p>', evt.layer.photo), {
+		evt.layer.bindPopup(L.Util.template('<a href="{url}" target="blank_"><img src="{url}" /></a><p>{caption}</p>', evt.layer.photo), {
 			className: 'leaflet-popup-photo',
 			minWidth: 400
 		}).openPopup();
 	});
+// FROM GOOGLE
+	
+	
+	$.getJSON("https://spreadsheets.google.com/feeds/list/1TugXPmO6ibDaHJAYhrFHo_DIa9BRyhiDvSBEP8Ox47I/od6/public/values?alt=json", function(data) {
+		result = data.feed.entry;
+		console.log(result);
+		var photos = [];
+		$.each(result, function(i, field){
+			if (field.gsx$latitude.$t === undefined){
 
+			}else{
+				if (!isNaN(parseFloat(field.gsx$latitude.$t))) {
+				
+					latitude = parseFloat(field.gsx$latitude.$t);
+					longitude = parseFloat(field.gsx$longitude.$t);
+					
+					photos.push({
+						lat: latitude,
+						lng: longitude,
+						url: field.gsx$largeurl.$t,
+						caption: "",
+						thumbnail: field.gsx$smallurl.$t
+					});
+
+					
+
+					$(".photos").append("<img src='"+field.gsx$smallurl.$t+"' onclick='zoomto("+latitude+","+longitude+")' alt='photo' height='42' width='42'>")
+							
+				}
+			}
+			
+		});
+
+		photoLayer.add(photos).addTo(map);
+		map.fitBounds(photoLayer.getBounds());
+	});
+// FROM KOBO
 	var koboforms = [
 		'https://kc.humanitarianresponse.info/api/v1/data/464745?format=jsonp',
 	];
@@ -120,61 +165,65 @@
 			url: form,
 			type: 'jsonp',
 			success: function (datas) {
-				var photos = [];
+				
 				console.log(datas);
 				
-				
+				var photos = [];
 				$.each(datas, function(i, data){
 					url = "";
-					
-					console.log(data);
+		
 					if (data._attachments.length>0) {
-						if (!isNaN(parseFloat(data._geolocation[0]))) {
-							nbhouses = "";
-							severity = "";
-							village = "";
-							numberAffecte = "";
+						if (data._geolocation[0] === undefined){
 
-							if(data.Nombre_de_maisons_affectees!=undefined){
-								nbhouses = "<strong>Number of affected houses</strong> : "+data.Nombre_de_maisons_affectees+"<br/>";
+						}else{
+							if (!isNaN(parseFloat(data._geolocation[0]))) {
+								nbhouses = "";
+								severity = "";
+								village = "";
+								numberAffecte = "";
+
+								if(data.Nombre_de_maisons_affectees!='undefined'){
+									nbhouses = "<strong>Number of affected houses</strong> : "+data.Nombre_de_maisons_affectees+"<br/>";
+								}
+
+								if(data.Nombre_de_maisons_affectees!='undefined'){
+									severity = "<strong>Severity</strong> : "+data.Severite_impact+"<br/>";
+								}
+
+								if(data.Nombre_de_maisons_affectees!='undefined'){
+									village = "<strong>Village </strong> : "+data.Nom_du_village+"<br/>";
+								}
+
+								if(data.Nombre_de_maisons_affectees!='undefined'){
+									numberAffecte = "<strong>Estimation of number of affected people</strong> : "+data.Estimation_nombre_pop+"<br/>";
+								}
+								console.log(data._geolocation[0]);
+
+								photos.push({
+									lat: data._geolocation[0],
+									lng: data._geolocation[1],
+									url: data._attachments[0].download_url,
+									caption: severity+nbhouses+numberAffecte+village,
+									thumbnail: data._attachments[0].download_small_url
+								});
+
+								
+
+								$(".photos").append("<img src='"+data._attachments[0].download_small_url+"' onclick='zoomto("+data._geolocation[0]+","+data._geolocation[1]+")' alt='photo' height='42' width='42'>")
 							}
-
-							if(data.Nombre_de_maisons_affectees!=undefined){
-								severity = "<strong>Number of affected houses</strong> : "+data.Severite_impact+"<br/>";
-							}
-
-							if(data.Nombre_de_maisons_affectees!=undefined){
-								village = "<strong>Number of affected houses</strong> : "+data.Nom_du_village+"<br/>";
-							}
-
-							if(data.Nombre_de_maisons_affectees!=undefined){
-								numberAffecte = "<strong>Estimation of number of affected people</strong> : "+data.Estimation_nombre_pop+"<br/>";
-							}
-
-
-							photos.push({
-								lat: data._geolocation[0],
-								lng: data._geolocation[1],
-								url: data._attachments[0].download_url,
-								caption: severity+nbhouses+numberAffecte+village,
-								thumbnail: data._attachments[0].download_small_url
-							});
-
-							$(".photos").append("<img src='"+data._attachments[0].download_small_url+"' onclick='zoomto("+data._geolocation[0]+","+data._geolocation[1]+")' alt='photo' height='42' width='42'>")
 						}
-						
 					}	
 				});
 
 				photoLayer.add(photos).addTo(map);
-				map.fitBounds(photoLayer.getBounds());
+								map.fitBounds(photoLayer.getBounds());
 			}
 		});
 	});
 
+	
+
 	function zoomto(lat,lng){
-		console.log("zoom to"+lat+" "+lng)
-		//map.flyTo([lat, lng], 3);
 		map.setView([lat, lng],10);
 	}
 
