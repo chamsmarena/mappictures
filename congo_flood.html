@@ -252,11 +252,16 @@
 		result = data.feed.entry;
 
 		var latestDatas = [];
+		console.log(result);
 		$.each(result, function(i, field){
+
 			if (!isNaN(parseFloat(field.gsx$nombredemaisonsaffectees.$t))) {
 			
 				nbMaison = parseFloat(field.gsx$nombredemaisonsaffectees.$t);
 				nbAffecte = parseFloat(field.gsx$calculnbpopaffecte.$t);
+				severite = field.gsx$severite.$t;
+				village = field.gsx$village.$t;
+
 
 				totalMaison+=nbMaison;
 				totalPopAffecte+=nbAffecte;
@@ -265,6 +270,8 @@
 					photo: field.gsx$photo.$t,
 					nbMaison: nbMaison,
 					nbPopAffecte: nbAffecte,
+					severite: severite,
+					village: village,
 				});
 			}
 		});
@@ -314,7 +321,9 @@
 										if (latestData.photo == data.Photo) {
 											nbhouses=latestData.nbMaison;
 											numberAffecte=latestData.nbPopAffecte;
-											console.log(data.Photo+" updated, val="+numberAffecte+" , photo="+latestData.photo);
+											severity = latestData.severite;
+											village = latestData.village;
+											console.log(data.Photo+" updated, val="+numberAffecte+" , photo="+latestData.photo+", severite ="+severity+", village ="+village);
 										}
 									});
 
