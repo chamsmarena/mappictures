@@ -252,19 +252,22 @@
 
 
 	//GET LATEST KEY FIGURESS
-	$.getJSON("https://spreadsheets.google.com/feeds/list/17qwONCFDFRUW_y-1HQzX6qQnGDZqi2OlzbAMf2jaxHc/od6/public/values?alt=json", function(data) {
-		result = data.feed.entry;
+	//$.getJSON("https://spreadsheets.google.com/feeds/list/17qwONCFDFRUW_y-1HQzX6qQnGDZqi2OlzbAMf2jaxHc/od6/public/values?alt=json", function(data) {
+	$.getJSON("https://sheets.googleapis.com/v4/spreadsheets/17qwONCFDFRUW_y-1HQzX6qQnGDZqi2OlzbAMf2jaxHc/values/data?alt=json&key=AIzaSyDOrhWBRhua2tHle2kC8dp1b3FIVZTmMK8", function(data) {
+		result = data.values;
+		console.log(result)
 
 		var latestDatas = [];
-		console.log(result);
-		$.each(result, function(i, field){
 
-			if (!isNaN(parseFloat(field.gsx$nombredemaisonsaffectees.$t))) {
+
+		console.log(result);
+		for (i = 1; i < result.length; i++) {
+			if (!isNaN(parseFloat(result[i]['Nombre_de_maisons_affectees']))) {
 			
-				nbMaison = parseFloat(field.gsx$nombredemaisonsaffectees.$t);
-				nbAffecte = parseFloat(field.gsx$calculnbpopaffecte.$t);
-				severite = field.gsx$severite.$t;
-				village = field.gsx$village.$t;
+				nbMaison = parseFloat(result[i]['Nombre_de_maisons_affectees']);
+				nbAffecte = parseFloat(result[i]['calcul_nb_pop_affecte']);
+				severite = result[i]['severite'];
+				village = result[i]['village'];
 
 
 				totalMaison+=nbMaison;
@@ -278,7 +281,8 @@
 					village: village,
 				});
 			}
-		});
+		}
+
 
 		/*
 		$('#NbPopulation').html(totalPopAffecte);
